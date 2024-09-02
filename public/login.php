@@ -1,5 +1,5 @@
 <?php
-include './php/functions.php';
+include '../src/functions.php';
 
 // handle login session
 session_start();

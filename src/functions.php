@@ -1,5 +1,5 @@
 <?php
-include './php/config.php';
+include '../config/config.php';
 
 /**
  * Creates a msqli connection object and returns it.

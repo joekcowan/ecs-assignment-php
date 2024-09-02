@@ -1,5 +1,5 @@
 <?php
-include './php/functions.php';
+include '../src/functions.php';
 
 session_start();
 // Check if the user is logged in, if not then redirect to login page
@@ -7,14 +7,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
   header("location: login.php");
   exit;
 }
-
 $orders = getOrders($_SESSION["userid"]);
-
-// check for order no.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $orderNo = $_POST['order_no'];
-  $order_details = getOrderDetails($orderNo);
-}
 
 
 ?>
@@ -27,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta name="description" content="">
   <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
   <meta name="generator" content="Hugo 0.104.2">
-  <title>Assignment | Order Details</title>
+  <title>Assignment | Home</title>
 
   <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/offcanvas-navbar/">
 
@@ -118,42 +111,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <?php include 'nav_content.php'; ?>
 
+
   <main class="container">
     <div class="d-flex align-items-center p-3 my-3 text-white bg-purple rounded shadow-sm">
       <div class="lh-1">
-        <h1 class="h6 mb-0 text-white lh-1"><a class="nav-item text-white" href="index.php">Console</a> | Order Details</h1>
-
+        <h1 class="h6 mb-0 text-white lh-1">Console</h1>
       </div>
     </div>
 
     <div class="my-3 p-3 bg-body rounded shadow-sm">
-      <h6 class="pb-1 mb-0"><strong><?php echo $order_details[0]['cust_name'] . ' (' . $order_details[0]['cust_abbr'] . ')'; ?></strong></h6>
-      <h6 class="border-bottom pb-2 mb-0">Order #<?php echo $order_details[0]['order_no']; ?></h6>
+      <h6 class="border-bottom pb-2 mb-0">Recent Orders</h6>
 
-      <div class="table-responsive">
-      <table class="table table-sm table-striped table-auto">
-        <thead class="table-dark">
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Qty</th>
-            <th scope="col">SKU - DESCRIPTION</th>
-          </tr>
-        </thead>
-        <tbody>
+      <?php
+      if (isset($orders) && count($orders) > 0) {
+        foreach ($orders as $order) {
+          $orderFormId = 'viewOrderForm-' . $order['order_no'];
+      ?>
+          <form action="order_details.php" method="get" id="<?php echo $orderFormId; ?>">
+            <div class="d-flex text-muted pt-3 ps-3">
+              <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false">
+                <title>Placeholder</title>
+                <rect width="100%" height="100%" fill="#007bff" /><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text>
+              </svg>
 
-          <?php for($i = 0; $i<count($order_details); $i++) { ?>
-            <tr>
-              <th scope="row"><?php echo $i+1; ?></td>
-              <td><?php echo $order_details[$i]['qty']; ?></td>
-              <td><?php echo $order_details[$i]['sku'].' - '.$order_details[$i]['item_name']; ?></td>
-            </tr>
-          <?php } ?>
-        </tbody>
-      </table>
-      </div>
+              <p class="pb-3 mb-0 small lh-sm">
+                <strong class="d-block text-gray-dark"><?php echo $order['cust_name'] . ' (' . $order['cust_abbr'] . ')'; ?></strong>
+                <strong class="d-block text-gray-dark"><a href="#" onclick="document.getElementById('<?php echo $orderFormId; ?>').submit();">ORDER # <?php echo $order['order_no']; ?></a></strong>
+                <input type="hidden" name="order_no" value="<?php echo $order['order_no']; ?>">
+              </p>
+            </div>
+          </form>
+          <hr>
+        <?php
+        }
+      } else {
+        ?>
+        <p class="text-muted mt-2">There are no orders to show.</p>
+      <?php }
+      ?>
+
 
       <small class="d-block text-end mt-3">
-        <a href="index.php">All orders</a>
+        <a href="#">All orders</a>
       </small>
     </div>
   </main>
