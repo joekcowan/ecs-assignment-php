@@ -1,8 +1,8 @@
 <?php
 
-$hostName = "147.182.186.186";
+$hostName = "";
 $userName = "phpmyadmin";
-$password = "password";
+$password = "";
 $dbName = "ecs-assignment";
 
 define('HOSTNAME', $hostName);
