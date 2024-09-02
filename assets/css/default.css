@@ -4,3 +4,8 @@
   font-weight: normal;
   font-style: normal;
 }
+
+.clickable:hover {
+  background: #CECECE;
+  cursor: pointer;
+}

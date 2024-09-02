@@ -1,59 +1,23 @@
 <?php
 include './php/functions.php';
 
-// handle login session
 session_start();
-$alertText = '';
+// Check if the user is logged in, if not then redirect to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+  header("location: login.php");
+  exit;
+}
 
+$orders = getOrders($_SESSION["userid"]);
+
+// check for order no.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $username = $_POST['username'];
-  $password = $_POST['password'];
-
-  // Prepare a select statement
-  $sql = "SELECT id, username, password FROM users WHERE username = ?";
-
-  $conn = create_conn();
-  if ($stmt = $conn->prepare($sql)) {
-      $stmt->bind_param("s", $username);
-
-      if ($stmt->execute()) {
-          $stmt->store_result();
-
-          if ($stmt->num_rows == 1) {
-              $stmt->bind_result($id, $username, $hashed_password);
-
-              if ($stmt->fetch()) {
-                  if ($password === $hashed_password) {
-                      // Password is correct, so start a new session
-                      session_start();
-
-                      // Store data in session variables
-                      $_SESSION["loggedin"] = true;
-                      $_SESSION["userid"] = $id;
-                      $_SESSION["username"] = $username;
-
-                      // Redirect user to welcome page
-                      header("location: index.php");
-                  } else {
-                      // Display an error message if password is not valid
-                      $alertText = "The password you entered was not valid.";
-                  }
-              }
-          } else {
-              // Display an error message if username doesn't exist
-              $alertText = "No account found with that username.";
-          }
-      }
-
-      $stmt->close();
-  }
-
-  $conn->close();
+  $orderNo = $_POST['order_no'];
+  $order_details = getOrderDetails($orderNo);
 }
 
 
 ?>
-
 <!doctype html>
 <html lang="en">
 
@@ -63,9 +27,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta name="description" content="">
   <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
   <meta name="generator" content="Hugo 0.104.2">
-  <title>Assignment | Login</title>
+  <title>Assignment | Order Details</title>
 
-  <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/sign-in/">
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/offcanvas-navbar/">
+
   <!-- Bootstrap CSS v5.2.1 -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -146,36 +111,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
   <!-- Custom styles for this template -->
-  <link href="assets/css/signin.css" rel="stylesheet">
+  <link href="assets/css/console.css" rel="stylesheet">
 </head>
 
-<body class="text-center">
+<body class="bg-light">
 
-  <main class="form-signin w-100 m-auto">
-    <form id='login-form' action="login.php" method="post">
-      <!-- <img class="mb-4" src="/docs/5.2/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> -->
-      <h1 class="h1 mb-3 fw-normal">Assignment Login</h1>
-      <h1 class="h3 mb-3 fw-normal ft-nunito">Please sign in</h1>
-      <p class="mb-3 fw-normal ft-nunito text-danger"><?php echo $alertText ?></p>
+  <?php include 'nav_content.php'; ?>
 
+  <main class="container">
+    <div class="d-flex align-items-center p-3 my-3 text-white bg-purple rounded shadow-sm">
+      <div class="lh-1">
+        <h1 class="h6 mb-0 text-white lh-1"><a class="nav-item text-white" href="index.php">Console</a> | Order Details</h1>
 
-      <div class="form-floating">
-        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
-        <label for="username">Username</label>
       </div>
-      <div class="form-floating">
-        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-        <label for="password">Password</label>
+    </div>
+
+    <div class="my-3 p-3 bg-body rounded shadow-sm">
+      <h6 class="pb-1 mb-0"><strong><?php echo $order_details[0]['cust_name'] . ' (' . $order_details[0]['cust_abbr'] . ')'; ?></strong></h6>
+      <h6 class="border-bottom pb-2 mb-0">Order #<?php echo $order_details[0]['order_no']; ?></h6>
+
+      <div class="table-responsive">
+      <table class="table table-sm table-striped table-auto">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Qty</th>
+            <th scope="col">SKU - DESCRIPTION</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <?php for($i = 0; $i<count($order_details); $i++) { ?>
+            <tr>
+              <th scope="row"><?php echo $i+1; ?></td>
+              <td><?php echo $order_details[$i]['qty']; ?></td>
+              <td><?php echo $order_details[$i]['sku'].' - '.$order_details[$i]['item_name']; ?></td>
+            </tr>
+          <?php } ?>
+        </tbody>
+      </table>
       </div>
 
-      <button class="w-100 btn btn-lg btn-primary" type="submit" value="Login">Sign in</button>
-    </form>
+      <small class="d-block text-end mt-3">
+        <a href="index.php">All orders</a>
+      </small>
+    </div>
   </main>
 
-<script src="js/functions.js"></script>
-<script>
-  // document.getElementById('login-form').addEventListener('submit', handleLoginSubmit);
-</script>
+
+  <script src="/docs/5.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+  <script src="offcanvas.js"></script>
 
 </body>
 
