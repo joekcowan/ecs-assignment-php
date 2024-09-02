@@ -1,4 +1,4 @@
-ECS Assignment
+ASSIGNMENT (PHP)
 
 Overview
 This project is a full-stack PHP application that simulates user login and order checking functionalities. It demonstrates how to implement basic user authentication and view dynamic data through a fullstack project.
