@@ -173,9 +173,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </main>
 
 <script src="js/functions.js"></script>
-<script>
-  // document.getElementById('login-form').addEventListener('submit', handleLoginSubmit);
-</script>
 
 </body>
 
