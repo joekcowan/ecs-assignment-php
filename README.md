@@ -6,6 +6,11 @@ This project is a full-stack PHP application that simulates user login and order
    - Middlewear: php
    - Backend: mysql database
 
+Notes:
+  - The correct db hostname and password will need to be edited in the config/config.php file for proper use. These are given externally. Typical behavior would use an .env file or other ways to privatize this info. But for the sake of the simulation of this assignment, I have simply chosen to provide those "hand-to-hand".
+  - Since requirements only require login simulation, I have skipped hashing passwords and any auth keys normally needed. AT NO TIME is the password served to the front end. It is merely searched for in the db as a string.
+  - Because the requirements for this assignment made data fetching very streight-forward to the user journey, there was no need for ajax as each data sets were only needed as the user went to a different page. Had their been more need for data to appear or be edited, an ajax system would have been necessary (thus why Javascript was lighter on this project).
+
 Features
 - User login from pre-created users.
 - User-specific order viewing.
